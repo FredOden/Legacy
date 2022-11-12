@@ -1,0 +1,173 @@
+<html>
+
+<head>
+    <title>Lourah text processing</title>
+   <script type="text/javascript" src="js/YConsole-compiled.js"></script> 
+   <script type="text/javascript" src="js/Lourah.js"></script> 
+   <script type="text/javascript" src="js/base/asyncWrapper.js"></script> 
+   <script type="text/javascript" src="js/base/httpRequest.js"></script> 
+   <script type="text/javascript" src="js/Google/translate.js"></script> 
+   
+   <script type="text/javascript" src="js/base/FileSystem.js"></script> 
+   <script type="text/javascript" src="js/base/Thread.js"></script> 
+   <script type="text/javascript" src="Node/sha256.js"></script>
+   <script type="text/javascript" src="Node/block.js"></script>
+   <script type="text/javascript" src="Node/blockchain.js"></script>
+
+   
+   <link name="codemirror" rel="stylesheet" href="../codemirror-5.39.0/lib/codemirror.css">
+   <script name="codemirror" src="../codemirror-5.39.0/lib/codemirror.js"></script>
+   <script name="codemirror" src="../codemirror-5.39.0/mode/javascript/javascript.js"></script>
+   
+   <script type="text/javascript" >
+       console.log("fs:: Lourah::"+ JSON.stringify(Lourah.base));
+       var fs = new Lourah.base.FileSystem();
+       console.log("new fs::"+fs);
+       try {
+       var source = fs.getFile("source").load();
+       console.log("source::"+source);
+       } catch(e) {
+       	console.log(e.message + "::" + e.stack);
+       	}
+   </script>
+   
+   <script>
+   	console.log("Lourah::"+ JSON.stringify(Lourah));
+   
+   	function toLowerCase(source, out) {
+   	var output = document.getElementById(out);
+       output.innerHTML = "IN";
+   	try {
+   	   var txt = document
+                        .getElementById(source).value;
+           document.getElementById(out)
+           .innerHTML = txt.toLowerCase();
+   	} catch(e) {
+     	document.getElementById(out)
+           .innerHTML = e;
+   	}
+   }
+   
+   
+async function doTranslate(source, from, to, out) {
+    	console.log(`doTranslate::${source},${from},${to},${out}`);
+
+       var { ok, response } = await Lourah.base.asyncWrapper(
+                  Lourah.Google.translate.request(
+           document.getElementById(source).value
+         , from, to, 'text'
+         ));
+         
+         document.getElementById(out).innerHTML = "translate::async::" + (!ok?"err::":"ok::") + response;
+         
+   }
+   
+
+	
+   function doEval(js) {
+   	"use strict";
+   
+       try {
+             return eval(js);
+         } catch (err) {
+         	return "doEval::ERR::"  + err + err.stack;
+     	}
+       return evaluation;
+	}
+	
+	function doSave(source) {
+		doLog("doSave::IN");
+		try {
+			fs
+             .$("source.js")
+             .save(document.getElementById(
+                source
+                ).value
+              );
+        
+		} catch (e) {
+           	doLog("doSave::" + e +e.stack);
+        }
+	}
+	
+	async function doSaveOnServer(serverUrl, filename, content) {
+		
+		var saveOnServerRequest = {
+       	headers : {
+       	   "Content-type" : "application/json; charser=utf-8"
+          	}
+          , method : 'POST'
+          , url : serverUrl + '/ws/file/' + filename
+          , body : JSON.stringify({ filename: filename
+                  , type: "text/js"
+                  , content: document.getElementById(content).value})
+          ,promise: Lourah.httpRequest
+         }
+         
+         var {ok, response} =await Lourah.base.asyncWrapper(Lourah.httpRequest(saveOnServerRequest));
+         doLog("doSaveOnServer*::" + ((!ok)?"ERR":"OK") + "::" + response);
+		}
+		
+	function doLoad(source) {
+		doLog("doLoad::IN");
+		
+		var t = document.getElementById(source);
+		
+		try {
+			 // doLog("doLoad::Try::" + JSON.stringify(localStorage));
+			  var s = fs.$("source.js").load();
+			  //doLog("doLoad::"+s);
+		      cm.setValue(s);
+		     // doLog("doLoad::Ok!::"+localStorage.source);
+		   } catch (e) {
+             doLog("doLoad::" + e + e.stack);
+       	}
+        
+		}
+		
+	  function doLog(m) {
+		document.getElementById("log").innerHTML += m + "<br>";
+		}
+	</script>
+
+</head>
+
+<body>
+     <button id="YConsoleToggleLog" onClick="Lourah.YConsoleToggleLog()">YConsole toggle log</button>
+     <button id="doEval" onClick="document.getElementById('bb').innerHTML = doEval(document.getElementById('text').value)">doEval</button>
+     <button id="doSave" onClick="doSave('text')">doSave</button>
+     <button id="doLoad" onClick="doLoad('text')">doLoad</button>
+
+    <br>enter text below<br>
+    <textarea id="text" name="code">var add = (a,b) => a + b;
+    add(6,7);
+    // 8
+   </textarea>
+    <br>
+    <button id="translator" onClick="doTranslate('text', 'en', 'fr', 'bb')">translate</button>
+    <button id="toLowerCase" onClick="toLowerCase('text', 'bb')">toLowerCase</button>
+    <button id="saveOnServer" onClick="doSaveOnServer('http://127.0.0.1:3000','test.js','text')">saveOnServer</button>
+    
+     
+    <br>output:<br>
+    <div id="bb" style="font:bold; backgroundColor: yellow">
+    </div>
+    <br>log:<br>
+    <div id="log">
+    </div>
+    
+       <script>
+      var textarea = document.getElementById("text");
+   	var cm = CodeMirror.fromTextArea(
+            textarea
+            , {
+            	mode : "javascript"
+               ,lineNumbers : true
+               ,lines : 5
+            	});
+        cm.on('change', me => textarea.value = me.getValue());
+   </script>
+
+</body>
+
+</html>

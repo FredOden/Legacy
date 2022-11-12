@@ -1,0 +1,31 @@
+<html>
+
+<head>
+    <title>js3d by Lourah</title>
+   <script type="text/javascript" src="js/YConsole-compiled.js"></script> 
+   <script type="text/javascript" src="js/Lourah.js"></script> 
+   
+   <script type="text/javascript" src="js/js3d/js3d.js"></script> 
+   <script type="text/javascript" src="stereoscopix.js"></script> 
+   <!--
+   <script type="text/javascript" src="gps.js"></script> 
+   -->
+   </head>
+<body>
+    <button id="YConsoleToggleLog" onClick="Lourah.YConsoleToggleLog()">YConsole toggle log</button>
+    <br>
+    <canvas id="left" style="border:1px solid #0000ff">
+        canvas is not supported !
+    </canvas>
+    <canvas id="right" style="border:1px solid #0000ff">
+        canvas is not supported !
+    </canvas>
+    
+    <br>a:<input id="a" type="range" min="0" max="360" step="1" value ="0" oninput="document.getElementById('a.o').value  = value;stereoscopixFromElements(['a', 'b', 'c'])"/><output id = "a.o">0</output>
+    <br>b:<input id="b" type="range" min="0" max="360" step="1" value ="0" oninput="document.getElementById('b.o').value  = value;stereoscopixFromElements(['a', 'b', 'c'])"/><output id = "b.o">0</output>
+    <br>c:<input id="c" type="range" min="0" max="360" step="1" value ="0" oninput="document.getElementById('c.o').value  = value;stereoscopixFromElements(['a', 'b', 'c'])"/><output id = "c.o">0</output>
+    <div id="infoposition">...gps...</div>
+    <div id="log"></div>
+    
+     <script>stereoscopix("left","right");</script>
+</body>

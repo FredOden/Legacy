@@ -1,0 +1,65 @@
+<html>
+
+<head>
+    <title>undersanding blockchain by Lourah</title>
+   <script type="text/javascript" src="js/YConsole-compiled.js"></script> 
+   <script type="text/javascript" src="js/Lourah.js"></script> 
+   
+   <script type="text/javascript" src="Node/sha256.js"></script>
+   <script type="text/javascript" src="Node/block.js"></script>
+   <script type="text/javascript" src="Node/blockchain.js"></script>
+  
+
+   <input type="text" id="difficulty" value="3" style="text-align:right"></input>
+
+
+   <script>
+   	try {
+       	function $$(id) { return document.getElementById(id); }
+           function log(str) {
+                $$("bb").innerHTML += "<br>" +str;
+           	}
+           var theChain = undefined;
+           } catch(e) {
+       	console.log("err::" + e);
+       	}
+   </script>
+    
+
+</head>
+
+<body>
+    <button id="YConsoleToggleLog" onClick="Lourah.YConsoleToggleLog()">YConsole toggle log</button>
+    
+       <div style="border-style:solid;border-color:blue">
+   	<input type="text" id="rough" value="abc" style="text-align:left"></input>
+
+       
+       <button id="testBlockchain" onClick="testBlockchain()">Test Blockchain</button>
+
+    	<script>
+    	function testBlockchain() {
+    	    try {
+    	
+            if (theChain === undefined) {
+            	theChain = new Lourah.blockchain.Blockchain($$("difficulty").value);
+               }
+            log("difficulty is:" + $$("difficulty").value);
+           
+    	    theChain.append($$("rough").value);
+            var l = JSON.stringify(Lourah);
+            log( `<br>"${theChain}"-><br>   "${l}"`);
+            } catch(e) {
+            	console.log("err::" + e);
+        	}
+        }
+    	</script>
+           </div>
+    
+    
+    <div id="bb" style="font:bold">
+    	Output:
+    </div>
+</body>
+
+</html>

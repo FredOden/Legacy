@@ -1,0 +1,133 @@
+<html>
+
+<head>
+    <title>js3d by Lourah</title>
+   <script type="text/javascript" src="js/YConsole-compiled.js"></script> 
+   <script type="text/javascript" src="js/Lourah.js"></script> 
+   
+   <script type="text/javascript" src="js/js3d/js3d.js"></script> 
+   
+       <script>
+        var camLeft = [5000, 3000, 40000];
+        var camFront = [0, 0, 40000];
+        var camRight = [-5000, 3000, 40000];
+        
+        var [t] = [[-00, -00, -00]];
+        
+        delta = 75;
+        var tLeft = [-130, 0, 0];
+        var tRight = [30, 0, 0];
+        
+    
+        
+        function circle(center, vector, r, color) {
+        	ret = new Array(360);
+            for(var i = 0; i < 70; i+=1) {
+            	ret[i] = [
+                          center[0] + r*Math.cos(i*Math.PI/180)
+                         , center[1] + r*Math.sin(i*Math.PI/180)
+                         , center[2]
+                         ];
+            	}
+               return {color:color, points:ret};
+        	}
+        
+        var ray = 150;
+        var circles = [];
+        var circles2 = [];
+        for(var j = 0; j < 40; j += .1) {
+        	var angle = j*Math.PI/180;
+        	circles.push(
+              circle([0,0,ray/2*Math.cos(angle)], [0,0,1], ray/2*Math.sin(angle), "#007F00")
+            );
+            circles2.push(
+              circle([10,0,ray*Math.cos(angle)], [0,0,1], ray*Math.sin(angle), "#00007F")
+            );
+        	}
+        
+        
+        function testJs3d(a, b, c) {
+        
+
+        var canvas = document.getElementById("canvas");
+        var ctx = canvas.getContext('2d');
+
+        var renderer = new Lourah.js3d.Renderer(canvas.width, canvas.height);
+        
+        var rot = Lourah.js3d.rot(a, b, c);
+        var rot2 = Lourah.js3d.rot(a, b, c);
+        
+        var transform = (p, rotation, translation, camera) => (
+          Lourah.js3d.toScreen(
+            Lourah.js3d.to2d(
+              Lourah.js3d.rotate(rotation,
+                  Lourah.js3d.translate(p, translation)
+                  )
+              , camera)
+           , [ctx.canvas.width, ctx.canvas.height])
+        );
+       
+        
+        var [o, i, j, k] = [
+           [[0, 0, 0], "O"]
+           ,[[100, 0, 0], "I"]
+           ,[[0, 100, 0], "J"]
+           ,[[0, 0, 100], "K"]
+          ];
+
+         ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+      
+          
+         [i,j,k].forEach(p => {
+               renderer.line(o[0], p[0], [255,0,0,255], null, tLeft, camLeft);
+               renderer.line(o[0], p[0], [0,255,255,255], null, tRight, camRight);
+               });
+               
+         /*
+         renderer.polygon([i[0],j[0],k[0]], [0,0,0,255],rot, tLeft, camLeft);
+         renderer.polygon([i[0],j[0],k[0]], [0,0,0,255],rot, tRight, camRight);
+         */
+         
+         var co = [0, 128, 0, 255]; 
+         var sz = 50;
+         var [a, b, c, d, e, f, g, h] = [
+         [0, sz, -sz], [sz*2, sz, -sz], [sz*2, -sz, -sz], [0, -sz, -sz],
+         [0, sz, sz], [sz*2, sz, sz], [sz*2, -sz, sz], [0, -sz, sz]
+         ];
+         
+         [[a,b,c,d],[e,f,g,h], [a,e,h,d], [b,f,g,c]].forEach(s => {
+            renderer.polygon(s, co, rot, tLeft, camLeft);
+            renderer.polygon(s, co, rot, tRight, camRight);
+            });
+         
+         /*
+         [{s:circles, r:rot, t:tLeft, c:[0,128,0,255]}, {s:circles2, r:rot2, t:tRight, c:[0,0,128,255]}]
+              .forEach(shape => shape.s.forEach(circle => {
+                  renderer.shape(circle.points , shape.c, shape.r, tLeft, camLeft);
+                  renderer.shape(circle.points , shape.c, shape.r, tRight, camRight);
+             }));
+         */
+         var imageData = renderer.flush(ctx.getImageData(0,0,ctx.canvas.width,ctx.canvas.height));
+         ctx.putImageData(imageData,0,0);
+     }
+     
+     function testJs3dFromElements(elements) {
+     	testJs3d(...elements.map(e => document.getElementById(e).value*Math.PI/180));
+     	}
+          
+    </script>
+</head>
+<body>
+    <button id="YConsoleToggleLog" onClick="Lourah.YConsoleToggleLog()">YConsole toggle log</button>
+    <br>
+    <canvas id="canvas" style="border:5px solid #0000ff" width="300" height='300'">
+        canvas is not supported !
+    </canvas>
+    
+    <br>a:<input id="a" type="range" min="0" max="360" step="1" value ="0" oninput="document.getElementById('a.o').value  = value;testJs3dFromElements(['a', 'b', 'c'])"/><output id = "a.o">0</output>
+    <br>b:<input id="b" type="range" min="0" max="360" step="1" value ="0" oninput="document.getElementById('b.o').value  = value;testJs3dFromElements(['a', 'b', 'c'])"/><output id = "b.o">0</output>
+    <br>c:<input id="c" type="range" min="0" max="360" step="1" value ="0" oninput="document.getElementById('c.o').value  = value;testJs3dFromElements(['a', 'b', 'c'])"/><output id = "c.o">0</output>
+    
+     <script>testJs3d(0,0,0);</script>
+</body>
+  
